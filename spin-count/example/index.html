@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../src/spin-count.css">
+    <title>basic example // spin-count examples</title>
+
+    <style>
+        html, body {
+            font: 400 64px/27px monospace;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="spin-count_404"></div>
+<br><br>
+<div class="spin-count_500"></div>
+
+</body>
+<script src="../src/spin-count.js"></script>
+<script>
+    new SpinCount('.spin-count_404');
+    new SpinCount('.spin-count_500', {
+        endValues: [0, 0, 5, 0, 0]
+    })
+</script>
+</html>

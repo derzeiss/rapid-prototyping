@@ -1,0 +1,69 @@
+$spin-count--spacing-h: 4px;
+$spin-count--spacing-v: 4px;
+$number--width: .9em;
+$number--height: 1.5em;
+
+.spin-count, .spin-count__col, .spin-count__numbers, .spin-count__number {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.spin-count {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.spin-count__col {
+  display: inline-block;
+  width: $number--width;
+  height: $number--height;
+  padding: 0 $spin-count--spacing-h / 2;
+  overflow: hidden;
+  line-height: $number--height;
+  text-align: center;
+  box-sizing: content-box;
+}
+
+.spin-count__numbers {
+  overflow: hidden;
+}
+
+.spin-count__number {
+  display: block;
+  height: $number--height;
+  margin-bottom: $spin-count--spacing-v;
+  color: #222;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+@keyframes spin-count {
+  // @formatter:off
+    0% { transform: translateY(0); }
+  100% { transform: translateY(-90%); }
+  // @formatter:on
+}
+
+@keyframes spin-count-to-0 {
+  // @formatter:off
+    0% { transform: translateY(-90%); }
+  100% { transform: translateY(0); }
+  // @formatter:on
+}
+
+@for $i from 1 to 10 {
+  @keyframes spin-count-to-#{$i} {
+      // @formatter:off
+      0% { transform: translateY(0); }
+    100% { transform: translateY(#{$i * -10%}); }
+    // @formatter:on
+  }
+}
