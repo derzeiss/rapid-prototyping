@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>particles</title>
+
+    <style>
+        html, body {
+            font: 400 18px/1.5em monospace;
+        }
+
+        h2 {
+            margin: 1rem .2rem;
+            font-weight: 400;
+            font-size: 1.3rem;
+        }
+
+        canvas {
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+
+<script src="modules/Util.js"></script>
+<script src="modules/String.js"></script>
+<script src="modules/Math.js"></script>
+<script src="modules/Color.js"></script>
+<script src="modules/Vector2.js"></script>
+<script src="modules/Particle.js"></script>
+<script src="modules/ParticleSpawner.js"></script>
+<script>
+    (function () {
+
+        const canvasWidth = 400,
+            canvasHeight = 300;
+
+        let spawners = [];
+
+        let sparkle = addCanvas('sparkle', {
+            maxParticles: 4,
+            spawnDelay: {
+                value: 40,
+                jitter: 19
+            },
+            particle: {
+                v: {
+                    value: 11,
+                    jitter: 4
+                },
+                gravity: {
+                    value: 1.3,
+                    jitter: .3
+                },
+                border: {
+                    width: {
+                        value: 1
+                    },
+                    color: {
+                        value: '#f59b00'
+                    }
+                },
+                width: {
+                    value: 2,
+                    jitter: 2
+                },
+                color: {value: '#f5b000'},
+                x: {value: canvasWidth / 2},
+                y: {value: canvasHeight * 4 / 5}
+            }
+        });
+
+        /*addCanvas('fountain', {
+            particle: {
+                x: {value: canvasWidth / 2},
+                y: {value: canvasHeight * 4 / 5},
+            }
+        });
+
+        addCanvas('curtain', {
+            particle: {
+                x: {
+                    value: canvasWidth / 2,
+                    jitter: 300
+                },
+                y: {
+                    value: canvasHeight / 5
+                },
+                v: {
+                    value: 0,
+                    jitter: .1
+                },
+                angle: {
+                    value: Math.PI2,
+                    jitter: .1
+                }
+
+            }
+        });*/
+
+        function addCanvas(canvasId, spawnerOptions) {
+            let h2 = document.createElement('h2'),
+                canvas = document.createElement('canvas'),
+                ctx = canvas.getContext('2d'),
+                spawner = new ParticleSpawner(ctx, spawnerOptions).play();
+            h2.appendChild(document.createTextNode(canvasId));
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            document.body.appendChild(h2);
+            document.body.appendChild(canvas);
+            spawners.push(spawner);
+            return spawner;
+        }
+
+        function mainloop() {
+            // request next frame
+            window.requestAnimationFrame(mainloop);
+
+            if (sparkle.isSpawning && Math.random() < .001) {
+                sparkle.pauseSpawning();
+                setTimeout(sparkle.playSpawning.bind(sparkle), Math.randrange(300, 500))
+            }
+
+            spawners.forEach(function (spawner) {
+                // clear canvas
+                spawner.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+                // update particleSpawner
+                spawner.update();
+                spawner.render();
+            });
+        }
+
+        mainloop();
+
+    })();
+
+</script>
+
+</html>
