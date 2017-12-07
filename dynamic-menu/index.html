@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>dynamic-menu</title>
+
+    <style>
+        * {
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font: 400 18px/27px monospace;
+        }
+
+        ul {
+            height: 0;
+            overflow: hidden;
+        }
+
+        li {
+            padding-left: 1rem;
+            cursor: pointer;
+        }
+
+        .dynamic-menu--expanded > ul {
+            height: auto;
+        }
+
+        .dynamic-menu--selected {
+            background: rgba(0, 0, 0, 0.1);
+        }
+    </style>
+
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="menu.js"></script>
+    <script src="data.js"></script>
+    <script>
+        $(document).ready(function () {
+            const menu = new $.DynamicMenu(TEST_DATA);
+            menu.appendTo($('.menu'));
+
+            menu.onItemSelected = function (key) {
+                console.log('custom onItemSelected', menu.getSelectedValue(), menu.getSelectedText());
+
+            };
+
+            menu.onItemToggle = function (node) {
+                console.log('custom onMenuToggle', node);
+            };
+
+            menu.addItem(null, 'test', 'TEST');
+            console.log(menu.node, menu.root);
+        });
+    </script>
+</head>
+<body>
+<div class="menu"></div>
+</body>
+</html>
