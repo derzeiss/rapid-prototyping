@@ -6,9 +6,30 @@
     <title>get-energized</title>
 
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
         canvas {
             display: block;
             background: #000;
+            /*animation: 3s linear infinite hue;*/
+        }
+
+        @keyframes hue {
+            0% {
+                filter: hue-rotate(0deg);
+                transform: scale(.4) rotate(0deg);
+            }
+            50% {
+                filter: hue-rotate(180deg);
+                transform: scale(1.5) rotate(180deg);
+            }
+            100% {
+                filter: hue-rotate(360deg);
+                transform: scale(.4) rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -17,8 +38,5 @@
 </body>
 
 <script src="assets/js/space-invader.js"></script>
-<script>
-    new SpaceInvader.Game({showFps: true});
-</script>
 
 </html>

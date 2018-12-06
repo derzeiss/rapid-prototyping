@@ -1,4 +1,4 @@
-const SpaceInvader = (() => {
+(() => {
     String.prototype.capitalize = function () {
         return this.charAt(0).toUpperCase() + this.substr(1);
     };
@@ -49,7 +49,7 @@ const SpaceInvader = (() => {
 
         Entity.prototype.render = function (ctx) {
             const self = this;
-            ctx.drawImage(self.img, self.x - self.img.width2, self.y - self.img.height2)
+            ctx.drawImage(self.img, self.x - self.img.width2, self.y - self.img.height2);
         };
 
         Entity.prototype.goLeft = function () {
@@ -76,9 +76,11 @@ const SpaceInvader = (() => {
     })();
 
     const Player = (() => {
+
         function Player(game, options) {
             const self = this;
             Entity.call(self, game, options);
+            self.reloadTime = 0;
         }
 
         Player.prototype = Object.create(Entity.prototype);
@@ -113,11 +115,15 @@ const SpaceInvader = (() => {
 
         Player.prototype.shoot = function () {
             const self = this;
+            if(self.reloadTime > 0) return;
             self.game.createEntity(Bullet, 'bullet', self.x, self.y);
+            self.reloadTime = 30;
+
         };
 
         Player.prototype.update = function () {
             const self = this;
+            self.reloadTime--;
 
             self.game.enemies.forEach((e) => {
                 if (Entity.CollideRect(self, e)) {
@@ -153,7 +159,8 @@ const SpaceInvader = (() => {
 
     const Bullet = (function () {
         Bullet.defaultOptions = {
-            speed: -5
+            speed: -5,
+            rotationSpeed: .2
         };
 
         function Bullet(game, options) {
@@ -166,13 +173,18 @@ const SpaceInvader = (() => {
                 x1: self.game.width + self.img.width2,
                 y0: 0 - self.img.height2,
                 y1: self.game.height + self.img.height2
-            }
+            };
+
+            self.rotation = 0;
+            self.rotationSpeed = self.options.rotationSpeed;
         }
 
         Bullet.prototype = Object.create(Entity.prototype);
 
         Bullet.prototype.update = function () {
             const self = this;
+            self.rotation = (self.rotation + self.rotationSpeed) % 6.282;
+
             if (self.x < self.visibleIn.x0 || self.x > self.visibleIn.x1
                 || self.y < self.visibleIn.y0 || self.y > self.visibleIn.y1) {
                 self.game.removeEntity(self);
@@ -181,7 +193,20 @@ const SpaceInvader = (() => {
                 for (let i = 0; i < self.game.enemies.length; i++) {
                     let enemy = self.game.enemies[i];
                     if (Entity.CollideRect(self, enemy)) {
-                        self.game.createEntity(Fx, 'explosion', enemy.x, enemy.y);
+                        self.game.createEntityEx(Fx, {
+                            gfx: 'explosion',
+                            x: enemy.x,
+                            y: enemy.y,
+                            duration: 20,
+                            from: {
+                                scale: 0,
+                                alpha: 1.4
+                            },
+                            to: {
+                                scale: 2.3,
+                                alpha: 0
+                            }
+                        });
                         self.game.removeEntity(self);
                         self.game.removeEntity(enemy);
                         hit = true;
@@ -190,6 +215,15 @@ const SpaceInvader = (() => {
                 }
                 if (!hit) self.y += self.vy
             }
+        };
+
+        Bullet.prototype.render = function (ctx) {
+            const self = this;
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, self.x, self.y); // set translation
+            ctx.rotate(self.rotation); // rotate image
+            ctx.drawImage(self.img, -self.img.width / 2, -self.img.height / 2);
+            ctx.restore();
         };
 
 
@@ -277,6 +311,8 @@ const SpaceInvader = (() => {
 
             self.x0 = self.x;
             self.y0 = self.y;
+            self.width0 = self.width = self.img.width;
+            self.height0 = self.height = self.img.height;
 
             self.lifetime = 0;
             self.animProps = [];
@@ -316,8 +352,7 @@ const SpaceInvader = (() => {
                 if (typeof fn === 'function') fn.call(self, ctx);
             });
 
-            Entity.prototype.render.call(self, ctx);
-
+            ctx.drawImage(self.img, self.x - self.width / 2, self.y - self.height / 2, self.width, self.height);
             ctx.restore();
         };
 
@@ -355,6 +390,21 @@ const SpaceInvader = (() => {
             self.alpha = Math.max(0, self.alpha + self.alphaStep);
         };
 
+        Fx.prototype.initScale = function () {
+            const self = this;
+            self.width *= self.from.scale;
+            self.height *= self.from.scale;
+            self.scale = self.from.scale;
+            self.scaleStep = (self.to.scale - self.from.scale) / self.duration;
+        };
+
+        Fx.prototype.animateScale = function () {
+            const self = this;
+            self.width = self.width0 * self.scale;
+            self.height = self.height0 * self.scale;
+            self.scale += self.scaleStep;
+        };
+
 
         return Fx;
     })();
@@ -367,17 +417,17 @@ const SpaceInvader = (() => {
             height: 400,
             showFps: false,
             gfx: {
-                player: 'assets/img/rocket-64.png',
-                enemy: 'assets/img/alien-48.png',
-                bullet: 'assets/img/bullet-20.png',
-                explosion: 'assets/img/explosion-32.png',
-                explosionShip: 'assets/img/explosion-48.png'
+                player: 'assets/img/worker-48.png',
+                enemy: 'assets/img/home-48.png',
+                bullet: 'assets/img/energy-meter-32.png',
+                explosion: 'assets/img/idea-48.png',
+                explosionShip: 'assets/img/rip-48.png'
             },
             enemies: {
-                x: 7,
+                x: 6,
                 y: 3,
-                spacingX: 1.5,
-                spacingY: 1.3
+                spacingX: 1.2,
+                spacingY: 1
             }
         };
 
@@ -395,7 +445,7 @@ const SpaceInvader = (() => {
             self.enemies = [];
             self.enemyDirection = 1;
             self.isRunning = false;
-            if(self.options.showFps) self.fps = new Fps();
+            if (self.options.showFps) self.fps = new Fps();
 
             self.loadAssets();
 
@@ -453,7 +503,7 @@ const SpaceInvader = (() => {
         Game.prototype.mainloop = function () {
             const self = this;
 
-            if(self.options.showFps) self.fps.increase();
+            if (self.options.showFps) self.fps.increase();
 
             self.calcEnemyMovement();
 
@@ -469,11 +519,18 @@ const SpaceInvader = (() => {
 
         Game.prototype.createEntity = function (cls, gfx, x, y) {
             const self = this;
-            let entity = new cls(self, {
+            return self.createEntityEx(cls, {
                 x: x,
                 y: y,
-                img: self.assets.get(gfx)
+                gfx: gfx
             });
+        };
+
+        Game.prototype.createEntityEx = function (cls, options) {
+            const self = this;
+            if (options.gfx) options.img = self.assets.get(options.gfx);
+
+            let entity = new cls(self, options);
             self.entities.push(entity);
             if (cls === Enemy) self.enemies.push(entity);
             return entity;
@@ -531,17 +588,18 @@ const SpaceInvader = (() => {
 
         Game.prototype.showText = function (text) {
             const self = this;
-            self.entities.push(new Text(self, {
+
+            self.createEntityEx(Text, {
                 x: self.width / 2,
                 y: self.height / 2,
                 maxWidth: self.width,
                 text: text
-            }));
+            });
         };
 
         Game.prototype.showMetaText = function (text) {
             const self = this;
-            self.entities.push(new Text(self, {
+            self.createEntityEx(Text, {
                 x: self.width / 2,
                 y: self.height / 2 + 55,
                 borderColor: null,
@@ -549,7 +607,7 @@ const SpaceInvader = (() => {
                 fontSize: 20,
                 maxWidth: self.width,
                 text: text,
-            }));
+            });
         };
 
         Game.prototype.loose = function () {
@@ -652,7 +710,5 @@ const SpaceInvader = (() => {
         DOWN: 40
     };
 
-    return {
-        Game: Game
-    };
+    new Game();
 })();

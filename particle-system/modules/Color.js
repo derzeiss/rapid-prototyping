@@ -5,6 +5,8 @@ const Color = (function () {
         self.rgb = Color.toRGB(hex);
 
         self.alpha = 1;
+
+        console.log('new color', self);
     }
 
     Color.toRGB = function (hex) {

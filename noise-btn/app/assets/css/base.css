@@ -1,0 +1,85 @@
+* {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+}
+
+html, body {
+    min-height: 100vh;
+    font: 400 18px/1.5rem sans-serif;
+    color: rgba(0, 0, 0, 0.87);
+    background: #fff;
+}
+
+.btn-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+
+    padding: .5rem;
+}
+
+.btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100px;
+    height: 100px;
+    margin: .5rem;
+    padding: 1rem;
+
+    text-align: center;
+    color: #fff;
+    border: 3px solid #1b1b1b;
+    border-radius: 8px;
+    background: #656565;
+    box-shadow: 0 3px 0 #000;
+
+    user-select: none;
+    cursor: pointer;
+}
+
+.btn:after {
+    content: attr(data-key);
+    position: absolute;
+    bottom: .2rem;
+    right: .2rem;
+    width: 1.6em;
+    height: 1.6em;
+
+    font-size: .8rem;
+    line-height: 1.6em;
+    text-align: center;
+
+    border-radius: 1000px;
+    background: rgba(0,0,0,0.6);
+}
+
+.btn_red {
+    background: #f00;
+    border-color: #a00;
+    box-shadow: 0 2px 0 #a00;
+}
+
+.btn_blue {
+    background: hsl(230, 68%, 41%);
+    border-color: hsl(230, 77%, 12%);
+    box-shadow: 0 2px 0 hsl(230, 77%, 12%);
+}
+
+.btn_lightblue {
+    background: #0af;
+    border-color: #06a;
+    box-shadow: 0 2px 0 #06a;
+}
+
+.btn:active, .btn_playing {
+    box-shadow: none;
+    transform: translateY(3px);
+}

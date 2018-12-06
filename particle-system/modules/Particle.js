@@ -44,6 +44,11 @@ const Particle = (function () {
         self.border = null;
         self.color = new Color(self.options.color);
         self.setBorder(self.options.border);
+        self.alpha = 1;
+
+        self.animate = {};
+
+        self.init();
     }
 
     Particle.prototype.setBorder = function (border) {
@@ -52,6 +57,19 @@ const Particle = (function () {
             width: border.width,
             strokeWidth: self.width + border.width * 2,
             color: new Color(border.color)
+        }
+    };
+
+    Particle.prototype.init = function() {
+        const self = this;
+        // init animated properties
+        if (self.options.animate) {
+            for (let animProp in self.options.animate) {
+                if (!self.options.animate.hasOwnProperty(animProp)) continue;
+
+                let func = self['initAnimate' + animProp.capitalize()].bind(self);
+                if (typeof func === 'function') func()
+            }
         }
     };
 
@@ -118,20 +136,34 @@ const Particle = (function () {
         self.y = self.oldY = self.options.y;
         self.v.set(self.options.v);
         self.lifetime = self.options.lifetime;
+        self.alpha = 1;
     };
 
     // animation
+    Particle.prototype.initAnimateAlpha = function() {
+        const self = this;
+
+        let start = self.options.animate.alpha.from,
+            end = self.options.animate.alpha.to,
+            delta = (end - start),
+            step = delta / self.options.lifetime;
+
+        self.animate.alpha = {
+            step,
+        };
+
+        self.alpha = start;
+
+        console.log('initAnim', start, end, delta, step, self.options);
+    };
+
     Particle.prototype.animateAlpha = function () {
         const self = this;
-        let alphaStart = self.options.animate.alpha.from,
-            alphaEnd = self.options.animate.alpha.to,
-            dAlpha = (alphaEnd - alphaStart),
-            currAlpha = alphaStart + dAlpha * ( 1 - self.lifetime / self.options.lifetime);
+        let nextVal = self.alpha + self.animate.alpha.step;
 
-        self.options.border.color.alpha = currAlpha;
-        self.options.color.alpha = currAlpha;
-
-        self.ctx.globalAlpha = currAlpha;
+        self.alpha = nextVal;
+        self.border.color.alpha = nextVal;
+        self.color.alpha = nextVal;
     };
 
     return Particle;

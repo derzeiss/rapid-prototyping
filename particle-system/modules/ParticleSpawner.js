@@ -66,7 +66,7 @@ const ParticleSpawner = (function () {
         // check if new particle must be spawned
         if (self.framesTillNextSpawn > 0) {
             self.framesTillNextSpawn--;
-        } else if (self.framesTillNextSpawn === 0 && self.particles.length < self.options.maxParticles) {
+        } else if (self.framesTillNextSpawn <= 0 && self.particles.length < self.options.maxParticles) {
             self.spawnParticle();
             self.framesTillNextSpawn = Math.round(applyJitter(self.options.spawnDelay));
         }

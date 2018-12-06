@@ -13,7 +13,7 @@ const Vector2 = (function () {
 
     /**
      * Adds either another Vector or two plain numbers to self
-     * @param v2 [Vector2|int} - vector or plain x value
+     * @param v2 {Vector2|int} - vector or plain x value
      * @param [y] {int} - plain y value
      */
     Vector2.prototype.add = function (v2, y) {
@@ -58,7 +58,7 @@ const Vector2 = (function () {
     Vector2.prototype.limit = function (n) {
         const self = this;
         const l = self.getLength();
-        if (l > Particle.MaxSpeed) {
+        if (l > n) {
             let factor = n / l;
             self.x *= factor;
             self.y *= factor;
