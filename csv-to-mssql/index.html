@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>csv-to-mssql</title>
+
+    <style>
+
+        * {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        html {
+            margin: 4rem;
+            font: 400 18px/1.5em monospace;
+        }
+
+        body {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 1.6rem;
+            font-weight: 400;
+            font-size: 1.6rem;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            min-height: 5rem;
+            margin-bottom: 2rem;
+            resize: vertical;
+        }
+
+        button {
+            margin-bottom: calc(2rem + 6px);
+            padding: .55rem 2rem;
+            font: inherit;
+            font-size: .8rem;
+            text-transform: uppercase;
+
+            color: #fff;
+            background: #222;
+            border: none;
+            box-shadow: 6px 6px 0 green;
+        }
+
+        button:active {
+            transform: translate(6px, 6px);
+            box-shadow: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<h1>CSV to MS-SQL Converter</h1>
+<textarea id="input" placeholder="Paste your CSV here..."></textarea>
+<button id="btn-convert">convert</button>
+<textarea id="output" placeholder="And copy the converted MS-SQL query!" readonly></textarea>
+
+</body>
+
+<script src="csv-to-mssql.js"></script>
+</html>
