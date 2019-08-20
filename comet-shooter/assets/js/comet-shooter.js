@@ -495,21 +495,21 @@ const Game = (() => {
         self.addToCollisionGroup('player', self.player);
 
         // add player 2
-        self.player2 = self.createEntityEx(Player, {
-            gfx: 'player',
-            x: self.width / 5,
-            y: self.height / 5,
-            keys: {
-                left: KEY.a,
-                right: KEY.d,
-                acc: KEY.w,
-                shoot: KEY.q
-            }
-        });
-        self.addToCollisionGroup('player', self.player2);
+        // self.player2 = self.createEntityEx(Player, {
+        //     gfx: 'player',
+        //     x: self.width / 5,
+        //     y: self.height / 5,
+        //     keys: {
+        //         left: KEY.a,
+        //         right: KEY.d,
+        //         acc: KEY.w,
+        //         shoot: KEY.q
+        //     }
+        // });
+        // self.addToCollisionGroup('player', self.player2);
 
 
-        self.addCollisionGroupMapping('player', 'player');
+        // self.addCollisionGroupMapping('player', 'player');
         self.addCollisionGroupMapping('player', 'comets');
         self.addCollisionGroupMapping('player', 'bullet');
         self.addCollisionGroupMapping('bullets', 'comets');
@@ -525,11 +525,6 @@ const Game = (() => {
         self.setScore(0);
 
         self.mainloop();
-    };
-
-    Game.prototype.createPlayer = function () {
-        const self = this;
-
     };
 
     Game.prototype._createTextElement = function (pTop, pRight) {
@@ -728,11 +723,11 @@ const Game = (() => {
         }
     };
 
-    Game.prototype.setScore = function (val) {
-        const self = this;
-        if (val === undefined || val === null) val = self.score + 1;
-        self.setElValue()
-    };
+    // Game.prototype.setScore = function (val) { TODO score
+    //     const self = this;
+    //     if (val === undefined || val === null) val = self.score + 1;
+    //     self.setElValue('score', val);
+    // };
 
     Game.prototype.setElValue = function (name, val) {
         const self = this;
@@ -774,7 +769,7 @@ const Game = (() => {
         self.isRunning = false;
     };
 
-    Game.prototype.draw = function(player) {
+    Game.prototype.draw = function() {
         const self = this;
         self.showText(`Draw!`);
         self.showMetaText('( click anywhere to play again )');
