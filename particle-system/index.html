@@ -40,8 +40,8 @@
 
         let spawners = [];
 
-        let sparkle = {isSpawning: false};
-        /*      let sparkle = addCanvas('sparkle', {
+        //let sparkle = {isSpawning: false};
+              let sparkle = addCanvas('sparkle', {
                   maxParticles: 4,
                   spawnDelay: {
                       value: 1,
@@ -76,7 +76,7 @@
                       x: {value: canvasWidth / 2},
                       y: {value: canvasHeight * 4 / 5}
                   }
-              });*/
+              });
 
         addCanvas('smoke', {
             maxParticles: 1,
@@ -86,7 +86,7 @@
             }
         });
 
-        /*addCanvas('fountain', {
+        addCanvas('fountain', {
             particle: {
                 x: {value: canvasWidth / 2},
                 y: {value: canvasHeight * 4 / 5},
@@ -112,7 +112,7 @@
                 }
 
             }
-        });*/
+        });
 
         function addCanvas(canvasId, spawnerOptions) {
             let h2 = document.createElement('h2'),

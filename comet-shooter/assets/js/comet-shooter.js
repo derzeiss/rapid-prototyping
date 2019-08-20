@@ -4,6 +4,18 @@ String.prototype.capitalize = function () {
 
 Math.PI2 = 2 * Math.PI;
 
+const KEY = {
+    SPACE: 32,
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    q: 81,
+    w: 87,
+    a: 65,
+    d: 68
+};
+
 const Entity = (() => {
 
     Entity.defaultOptions = {
@@ -21,6 +33,8 @@ const Entity = (() => {
         self.y = self.options.y;
         self.img = self.options.img;
         self.inCollisionGroups = [];
+
+        self._type = 'Entity';
     }
 
     Entity.CollideRect = (a, b) => {
@@ -36,6 +50,9 @@ const Entity = (() => {
     };
 
     Entity.prototype.onCollision = function (entity, mapping) {
+    };
+
+    Entity.prototype.onRemove = function () {
     };
 
     Entity.prototype.update = function () {
@@ -86,6 +103,8 @@ const Moveable = (function () {
         self.rVMax = self.options.rVMax;
 
         self.damp = self.options.damp;
+
+        self._type = 'Moveable';
     }
 
     Moveable.prototype = Object.create(Entity.prototype);
@@ -117,12 +136,42 @@ const Moveable = (function () {
 const Player = (() => {
     // extends Moveable
 
+    let idCounter = 1;
+
+    Player.defaultOptions = {
+        keys: {
+            left: KEY.LEFT,
+            right: KEY.RIGHT,
+            acc: KEY.UP,
+            shoot: KEY.SPACE
+        }
+    };
+
     function Player(game, options) {
         const self = this;
+        self.options = options = Object.assign({}, Player.defaultOptions, options);
         Moveable.call(self, game, options);
+        if(!self.name) self.name = `Player ${idCounter++}`;
+        self.handler = {};
+
+        self._type = 'Player';
+        self.init();
     }
 
     Player.prototype = Object.create(Moveable.prototype);
+
+    Player.prototype.init = function () {
+        const self = this;
+
+        // add listeners. The handlers are removed in onRemove()
+        self.handler.keydown = self.onKeydown.bind(self);
+        self.handler.keyup = self.onKeyup.bind(self);
+        window.addEventListener('keydown', self.handler.keydown);
+        window.addEventListener('keyup', self.handler.keyup);
+
+        // add to collision group
+        self.game.addToCollisionGroup('player', self);
+    };
 
     Player.prototype.update = function () {
         const self = this;
@@ -134,11 +183,22 @@ const Player = (() => {
         else if (self.y > self.game.height) self.y = 0;
     };
 
+    Player.prototype.onRemove = function () {
+        const self = this;
+        // remove listeners added in init()
+        window.removeEventListener('keydown', self.handler.keydown);
+        window.removeEventListener('keyup', self.handler.keyup);
+    };
+
     Player.prototype.onCollision = function (entity) {
         const self = this;
         self.game.createEntity(Fx, 'explosionShip', self.x, self.y);
-        self.game.removeEntity(entity);
         self.game.removeEntity(self);
+
+        if (entity._type === 'Player') {
+            self.game.createEntity(Fx, 'explosionShip', entity.x, entity.y);
+        }
+        self.game.removeEntity(entity);
         self.game.loose();
     };
 
@@ -147,16 +207,16 @@ const Player = (() => {
         if (ev.repeat) return;
 
         switch (ev.keyCode) {
-            case KEY.LEFT:
+            case self.options.keys.left:
                 self.rotateLeft();
                 break;
-            case KEY.RIGHT:
+            case self.options.keys.right:
                 self.rotateRight();
                 break;
-            case KEY.UP:
+            case self.options.keys.acc:
                 self.accelerate();
                 break;
-            case KEY.SPACE:
+            case self.options.keys.shoot:
                 self.shoot();
                 break;
         }
@@ -166,13 +226,13 @@ const Player = (() => {
         const self = this;
 
         switch (ev.keyCode) {
-            case KEY.LEFT:
+            case self.options.keys.left:
                 self.stopRotateLeft();
                 break;
-            case KEY.RIGHT:
+            case self.options.keys.right:
                 self.stopRotateRight();
                 break;
-            case KEY.UP:
+            case self.options.keys.acc:
                 self.stopAccelerate();
                 break;
         }
@@ -233,6 +293,8 @@ const Bullet = (function () {
         const self = this;
         self.options = Object.assign({}, Bullet.defaultOptions, options);
         Moveable.call(self, game, self.options);
+        self._type = 'Bullet';
+
         self.init();
     }
 
@@ -308,6 +370,8 @@ const Comet = (function () {
         //    If the comet gets inside bounds isEntering is set to 0 immediately (0 = false)
         //    If isEntering is 0 and comet gets out of bounds its removed
         self.isEntering = self.options.isEnteringFrames;
+
+        self._type = 'Comet';
     }
 
     Comet.prototype = Object.create(Moveable.prototype);
@@ -319,10 +383,10 @@ const Comet = (function () {
         // comet is out of screen bounds
         if (self.x < 0 || self.x > self.game.width || self.y < 0 || self.y > self.game.height) {
             // comet wasn't in bounds before and entering period ends this frame -> remove it
-            if(self.isEntering === 1) self.game.removeEntity(self);
+            if (self.isEntering === 1) self.game.removeEntity(self);
 
             // comet wasn't in bounds before but is still in entering period -> decrease time left to enter bounds
-            if(self.isEntering > 0) self.isEntering--;
+            if (self.isEntering > 0) self.isEntering--;
 
             // comet was in bounds before -> place it at the other end of the screen
             if (!self.isEntering) {
@@ -363,7 +427,7 @@ const Game = (() => {
             increase: .001,
             max: .2
         },
-        maxComets: 50,
+        maxComets: 10,
         cometMaxSpeed: 2,
         cometStartingPositionOffset: 30,  // offset in px from the screen edge
         gfx: {
@@ -390,7 +454,7 @@ const Game = (() => {
         self.collisionGroups = {};
         self.collisionGroupMappings = [];
 
-        self.cometSpawnRate = self.options.cometSpawnRate.initial;
+        self.cometSpawnRate = null;  // set in init
         self.maxComets = self.options.maxComets;
         self.cometMaxSpeed = self.options.cometMaxSpeed;
 
@@ -404,6 +468,7 @@ const Game = (() => {
             hits: 0
         };
         self.el = {};
+        self.players = [];
 
 
         if (self.options.showFps) self.fps = new Fps();
@@ -423,15 +488,30 @@ const Game = (() => {
     Game.prototype.init = function () {
         const self = this;
 
+        self.cometSpawnRate = self.options.cometSpawnRate.initial;
+
         // add player
         self.player = self.createEntity(Player, 'player', self.width / 2, self.height / 2);
-        self.handler.keydown = self.player.onKeydown.bind(self.player);
-        self.handler.keyup = self.player.onKeyup.bind(self.player);
-        window.addEventListener('keydown', self.handler.keydown);
-        window.addEventListener('keyup', self.handler.keyup);
         self.addToCollisionGroup('player', self.player);
 
+        // add player 2
+        self.player2 = self.createEntityEx(Player, {
+            gfx: 'player',
+            x: self.width / 5,
+            y: self.height / 5,
+            keys: {
+                left: KEY.a,
+                right: KEY.d,
+                acc: KEY.w,
+                shoot: KEY.q
+            }
+        });
+        self.addToCollisionGroup('player', self.player2);
+
+
+        self.addCollisionGroupMapping('player', 'player');
         self.addCollisionGroupMapping('player', 'comets');
+        self.addCollisionGroupMapping('player', 'bullet');
         self.addCollisionGroupMapping('bullets', 'comets');
 
         self.canvas.addEventListener('click', self.reset.bind(self));
@@ -447,16 +527,20 @@ const Game = (() => {
         self.mainloop();
     };
 
-    Game.prototype._createTextElement = function(pTop, pRight) {
+    Game.prototype.createPlayer = function () {
         const self = this;
 
+    };
+
+    Game.prototype._createTextElement = function (pTop, pRight) {
+
         let el = document.createElement('div');
-        el .style.position = 'absolute';
-        el .style.top = pTop;
-        el .style.right = pRight;
-        el .style.color = '#fff';
-        el .style.font = '400 18px monospace';
-        el .style.textShadow = '0 0 3px #000';
+        el.style.position = 'absolute';
+        el.style.top = pTop;
+        el.style.right = pRight;
+        el.style.color = '#fff';
+        el.style.font = '400 18px monospace';
+        el.style.textShadow = '0 0 3px #000';
         document.body.appendChild(el);
 
         return el;
@@ -469,9 +553,8 @@ const Game = (() => {
         Object.assign([], self.entities).forEach((e) => {
             self.removeEntity(e);
         });
-        window.removeEventListener('keydown', self.handler.keydown);
-        window.removeEventListener('keyup', self.handler.keyup);
-        self.scoreCounter.parentNode.removeChild(self.scoreCounter);
+
+        // self.scoreCounter.parentNode.removeChild(self.scoreCounter);
         self.init();
     };
 
@@ -517,6 +600,9 @@ const Game = (() => {
     Game.prototype.removeEntity = function (entity) {
         const self = this;
 
+        // fire entity callback
+        entity.onRemove();
+
         // remove from global entity list
         entity.removeFromList(self.entities);
 
@@ -526,6 +612,7 @@ const Game = (() => {
         });
 
         self.updateCollisionGroupMappings();
+
     };
 
     /**
@@ -578,7 +665,7 @@ const Game = (() => {
             self.collisionGroups[mapping.g1].forEach((entity1) => {
                 for (let i = 0; i < g2.length; i++) {
                     let entity2 = g2[i];
-                    if (Entity.CollideRect(entity1, entity2)) {
+                    if (entity1 !== entity2 && Entity.CollideRect(entity1, entity2)) {
                         entity1.onCollision(entity2, mapping);
                     }
                 }
@@ -641,7 +728,7 @@ const Game = (() => {
         }
     };
 
-    Game.prototype.setScore = function(val) {
+    Game.prototype.setScore = function (val) {
         const self = this;
         if (val === undefined || val === null) val = self.score + 1;
         self.setElValue()
@@ -650,7 +737,7 @@ const Game = (() => {
     Game.prototype.setElValue = function (name, val) {
         const self = this;
         let el = self.el[name];
-        if(!el) return;
+        if (!el) return;
 
         self.score = val;
         self.scoreCounter.innerHTML = `Score: ${self.score}`;
@@ -678,6 +765,20 @@ const Game = (() => {
             maxWidth: self.width,
             text: text,
         });
+    };
+
+    Game.prototype.win = function(player) {
+        const self = this;
+        self.showText(`${player.name} wins!`);
+        self.showMetaText('( click anywhere to play again )');
+        self.isRunning = false;
+    };
+
+    Game.prototype.draw = function(player) {
+        const self = this;
+        self.showText(`Draw!`);
+        self.showMetaText('( click anywhere to play again )');
+        self.isRunning = false;
     };
 
     Game.prototype.loose = function () {
@@ -943,13 +1044,5 @@ const Fps = (function () {
 
     return Fps;
 })();
-
-const KEY = {
-    SPACE: 32,
-    LEFT: 37,
-    UP: 38,
-    RIGHT: 39,
-    DOWN: 40
-};
 
 new Game();
