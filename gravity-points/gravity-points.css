@@ -1,0 +1,17 @@
+* {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  min-height: 100vh;
+  font: 400 18px/27px monospace;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

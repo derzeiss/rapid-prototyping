@@ -1,0 +1,11 @@
+<input type="text" placeholder="search" ng-model="search">
+
+<div class="box-wrapper">
+    <div class="box"
+         ng-repeat="box in $ctrl.boxes | filter:search"
+         ng-style="{
+            background: box.color,
+            transform: 'translate(' + ($index % $ctrl.elementsPerRow) * 100 + '%, ' + $ctrl.floor($index / $ctrl.elementsPerRow) * 100 + '%)'}">
+        {{box.text}}
+    </div>
+</div>

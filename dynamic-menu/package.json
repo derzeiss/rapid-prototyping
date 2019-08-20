@@ -1,0 +1,9 @@
+{
+  "name": "dynamic-menu",
+  "version": "0.0.1",
+  "author": "derzeiss",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "jquery": "^3.2.1"
+  }
+}
