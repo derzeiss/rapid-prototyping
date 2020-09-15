@@ -316,7 +316,7 @@ const Bullet = (function () {
         const self = this;
         self.game.removeEntity(self);
         self.game.removeEntity(entity);
-        self.game.setScore();
+        // self.game.setScore();
 
         self.game.createEntityEx(Fx, {
             gfx: 'explosion',
@@ -522,7 +522,7 @@ const Game = (() => {
             right = window.innerWidth - (self.canvas.offsetLeft + self.canvas.offsetWidth) + 10 + 'px';
         self.el.score = self._createTextElement(top + 'px', right);
         self.el.accuracy = self._createTextElement(top + 20 + 'px', right);
-        self.setScore(0);
+        // self.setScore(0);
 
         self.mainloop();
     };

@@ -14,7 +14,7 @@
             img: null
         };
 
-        function Entity(game, options) {
+        function Entity (game, options) {
             const self = this;
             self.game = game;
             self.options = Object.assign({}, Entity.defaultOptions, options);
@@ -77,7 +77,7 @@
 
     const Player = (() => {
 
-        function Player(game, options) {
+        function Player (game, options) {
             const self = this;
             Entity.call(self, game, options);
             self.reloadTime = 0;
@@ -115,9 +115,9 @@
 
         Player.prototype.shoot = function () {
             const self = this;
-            if(self.reloadTime > 0) return;
+            if (self.reloadTime > 0) return;
             self.game.createEntity(Bullet, 'bullet', self.x, self.y);
-            self.reloadTime = 30;
+            self.reloadTime = 25;
 
         };
 
@@ -146,7 +146,7 @@
             speed: 2
         };
 
-        function Enemy(game, options) {
+        function Enemy (game, options) {
             const self = this;
             options = Object.assign({}, Enemy.defaultOptions, options);
             Entity.call(self, game, options);
@@ -163,7 +163,7 @@
             rotationSpeed: .2
         };
 
-        function Bullet(game, options) {
+        function Bullet (game, options) {
             const self = this;
             options = Object.assign({}, Bullet.defaultOptions, options);
             Entity.call(self, game, options);
@@ -243,7 +243,7 @@
             textBaseline: 'middle'
         };
 
-        function Text(game, options) {
+        function Text (game, options) {
             const self = this;
             options = Object.assign({}, Text.defaultOptions, options);
             Entity.call(self, game, options);
@@ -300,7 +300,7 @@
             }
         };
 
-        function Fx(game, options) {
+        function Fx (game, options) {
             const self = this;
             options = Object.assign({}, Fx.defaultOptions, options);
             Entity.call(self, game, options);
@@ -415,7 +415,7 @@
             canvasId: 'space-invader',
             width: 600,
             height: 400,
-            showFps: false,
+            showFps: true,
             gfx: {
                 player: 'assets/img/worker-48.png',
                 enemy: 'assets/img/home-48.png',
@@ -431,7 +431,7 @@
             }
         };
 
-        function Game(options) {
+        function Game (options) {
             const self = this;
             self.options = Object.assign({}, Game.defaultOptions, options);
             self.canvas = document.getElementById(self.options.canvasId);
@@ -628,7 +628,7 @@
     })();
 
     const Assets = (function () {
-        function Assets() {
+        function Assets () {
             const self = this;
             self.assets = {};
             self.queue = [];
@@ -639,7 +639,7 @@
         Assets.prototype.add = function (name, path) {
             const self = this;
             if (self.loaded) throw new Error('Asset added after assets are loaded');
-            self.queue.push({name: name, path: path});
+            self.queue.push({ name: name, path: path });
         };
 
         Assets.prototype.get = function (name) {
@@ -668,6 +668,9 @@
                     self.assets[item.name] = img;
                     if (self.onProgress()) cb();
                 };
+                img.onerror = () => {
+                    throw new Error(`Asset can\'t be found: ${item.path}`);
+                };
                 img.src = item.path;
             });
         };
@@ -681,7 +684,7 @@
     })();
 
     const Fps = (function () {
-        function Fps() {
+        function Fps () {
             const self = this;
             self._current = 0;
             setTimeout(self.print.bind(self), 1000);

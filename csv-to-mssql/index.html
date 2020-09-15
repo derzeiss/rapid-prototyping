@@ -30,6 +30,11 @@
             font-size: 1.6rem;
         }
 
+        small {
+            font-size: .8rem;
+            opacity: .5;
+        }
+
         textarea {
             display: block;
             width: 100%;
@@ -60,7 +65,11 @@
 </head>
 <body>
 
-<h1>CSV to MS-SQL Converter</h1>
+<h1>
+    CSV to MS-SQL Converter<br>
+    <small>To Janni with ♥</small>
+</h1>
+
 <textarea id="input" placeholder="Paste your CSV here..."></textarea>
 <button id="btn-convert">convert</button>
 <textarea id="output" placeholder="And copy the converted MS-SQL query!" readonly></textarea>

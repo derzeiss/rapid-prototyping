@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>font-sniffer</title>
+    <style>
+        @font-face {
+            font-family: 'iconfont';
+            font-style: normal;
+            font-weight: 400;
+            src: url('iconfont.woff') format('woff');
+        }
+
+        html {
+            margin: 0;
+            padding: 0;
+            font: 300 16px/1.5rem monospace;
+        }
+
+        body {
+            max-width: 50.3rem;
+            margin: 0 auto;
+            padding: 3rem;
+        }
+
+        #glyphs {
+            margin: 1rem -.5rem;
+        }
+
+        .icon-preview {
+            display: inline-block;
+            margin: .5rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            text-align: center;
+            color: #aaa;
+        }
+
+        .icon-preview:before {
+            content: attr(data-content);
+            display: block;
+            margin: .5rem 0 1rem;
+            font-family: 'iconfont', sans-serif;
+            font-size: 2.5rem;
+            line-height: 2.5rem;
+            color: #000;
+        }
+
+        .icon-preview:active {
+            transform: scale(.95);
+        }
+
+        .text-meta {
+            color: #aaa;
+            font-size: .9rem;
+        }
+
+        .row-flex {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        input, button {
+            margin: .5rem;
+            padding: .3rem .5rem;
+
+            font: inherit;
+            font-size: .9rem;
+
+            border: none;
+            border-radius: 5px;
+            background: #f0f0f0;
+        }
+
+        button {
+            padding: .3rem 1rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            cursor: pointer;
+            color: #fff;
+            background: #333;
+            transition: background .1s;
+        }
+
+        button:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+<h1>font-sniffer</h1>
+<form id="form" action="">
+    <div class="row-flex">
+        <div>Show characters</div>
+        <input id="from" type="number" value="59648" placeholder="first char">
+        <div>to</div>
+        <input id="to" type="number" value="59783" placeholder="last char">
+    </div>
+    <div class="row-flex">
+        <div>from</div>
+        <input id="font" type="text" value="fbm" placeholder="font name">
+        <button type="submit">Go</button>
+    </div>
+</form>
+<div class="text-meta">(Make shure the font is installed)</div>
+
+<div id="glyphs">
+
+</div>
+
+
+</body>
+
+<script>
+const FontSniffer = (function () {
+    // variables
+    var $from = document.getElementById('from');
+    var $to = document.getElementById('to');
+    var $font = document.getElementById('font');
+    var $form = document.getElementById('form');
+    var $glyphs = document.getElementById('glyphs');
+
+    // add listener
+    $form.addEventListener('submit', generateGlyphs);
+
+    // show default glyphs onDocumentReady
+    window.onload = generateGlyphs;
+
+    // functions
+    function generateGlyphs (ev) {
+        if (ev) ev.preventDefault();
+
+        const from = $from.value;
+        const to = parseInt($to.value) + 1;
+        const font = $font.value;
+        let html;
+
+        html = fillTemplate(
+            '<style>.icon-preview:before {font-family: "~font~", chalkboard, cursive;}</style>',
+            { font: font });
+
+        for (var i = from; i < to; i++) {
+
+            html += fillTemplate(
+                `<div class="icon-preview" data-content="&#~i~" onclick="FontSniffer.copyTextToClipboard('&#~i~')">&amp#~i~ <br> \\~iHex~</div>`,
+                { i: pad5(i), iHex: pad4(i.toString(16)) });
+        }
+        $glyphs.innerHTML = html;
+    }
+
+    function pad4 (val) {
+        return ("0000" + val).slice(-4);
+    }
+
+    function pad5 (val) {
+        return ("00000" + val).slice(-5);
+    }
+
+    const TPL_START = '~';
+    const TPL_END = '~';
+
+    function fillTemplate (tpl, data) {
+        return Object.keys(data).reduce((tplToFill, key) => {
+            const pattern = new RegExp(TPL_START + key + TPL_END, 'g');
+            return tplToFill.replace(pattern, data[key]);
+        }, tpl);
+    }
+
+    // -- clipboard --
+    function fallbackCopyTextToClipboard (text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            const msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Fallback: Copying text command was ' + msg);
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+        }
+
+        document.body.removeChild(textArea);
+    }
+
+    function copyTextToClipboard (text) {
+        if (!navigator.clipboard) {
+            fallbackCopyTextToClipboard(text);
+            return;
+        }
+        navigator.clipboard.writeText(text).then(function () {
+            console.log('Async: Copying to clipboard was successful!');
+        }, function (err) {
+            console.error('Async: Could not copy text: ', err);
+        });
+    }
+
+    return {
+        copyTextToClipboard
+    }
+})();
+</script>
+
+</html>
