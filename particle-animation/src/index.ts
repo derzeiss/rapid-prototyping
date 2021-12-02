@@ -35,7 +35,7 @@ const GET_CONFIG_IUCON_HR = () => {
 
   return {C_BG, GET_C_PARTICLE, GET_C_EDGE};
 }
-const {C_BG, GET_C_PARTICLE, GET_C_EDGE} = GET_CONFIG_IUCON_HR();
+const {C_BG, GET_C_PARTICLE, GET_C_EDGE} = GET_CONFIG_SCHWEITZER();
 
 // -- HELPER METHODS --
 const random = (min: number, max?: number) => {
@@ -119,13 +119,13 @@ _window.__Particle_app = class App {
 class Particle {
   x: number;
   y: number;
-  private radius: number;
+  private readonly radius: number;
   private angle: number;              // angle in degrees
   private radians: number = 0;        // angle in radians
   private speed: number;
   private vx: number = 0;             // -> calc once, then don't use sin/cos each frame
   private vy: number = 0;             // -> calc once, then don't use sin/cos each frame
-  private color: string;
+  private readonly color: string;
 
   constructor(x: number, y: number, radius: number, angle: number, speed: number, color: string) {
     this.x = x;
