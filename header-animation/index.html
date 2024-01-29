@@ -1,0 +1,95 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="page-top"></div>
+
+      <!-- page-header -->
+      <div class="page-header-container">
+        <div class="page-header">
+          <a aria-current="page" class="page-header__logo" href="#hero">
+            <img src="/img/logo_img.svg" class="logo__sticky" />
+            <img src="/img/logo_text.svg" class="logo__hideable" />
+          </a>
+          <div>
+            <button type="button" class="hamburger">
+              <div class="hamburger__lines">
+                <div class="hamburger__line hamburger__line-top"></div>
+                <div class="hamburger__line hamburger__line-bot"></div>
+              </div>
+            </button>
+            <div class="menu">
+              <nav class="menu__nav">
+                <a class="menu__link" href="#hero">Home</a>
+                <a class="menu__link" href="#menu">Menu</a>
+                <a class="menu__link" href="#daily-deals">Daily Deals</a>
+                <a class="menu__link" href="#about-us">About us</a>
+                <a class="menu__link" href="#press">Press</a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- demo content -->
+      <div class="demo-content">
+        <a class="link-target" name="hero"></a>
+        Hero
+      </div>
+      <div class="demo-content">
+        <a class="link-target" name="menu"></a>
+        Menu
+      </div>
+      <div class="demo-content">
+        <a class="link-target" name="daily-deals"></a>
+        Daily Deals
+      </div>
+      <div class="demo-content">
+        <a class="link-target" name="about-us"></a>
+        About us
+      </div>
+      <div class="demo-content">
+        <a class="link-target" name="press"></a>
+        Press
+      </div>
+      <div class="demo-content">
+        <a class="link-target" name="footer"></a>
+        Footer
+      </div>
+    </main>
+
+    <style>
+      .demo-content {
+        display: flex;
+        align-items: center;
+
+        position: relative;
+        width: 90%;
+        max-width: 1300px;
+        height: 48vh;
+        margin: auto;
+
+        font-size: 1.5rem;
+        border-bottom: 1px solid var(--neutral-900);
+      }
+
+      .link-target {
+        position: absolute;
+        top: -5rem;
+      }
+    </style>
+
+    <script src="./hamburger-menu.js"></script>
+    <script src="./logo-intersection-observer.js"></script>
+    <script>
+      (() => {
+        window._setupHamburgerMenu();
+        window._setupLogoIntersectionObserver();
+      })();
+    </script>
+  </body>
+</html>
